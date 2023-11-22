@@ -1,6 +1,9 @@
 package br.com.alurafood.pagamentos.service;
 
+import java.util.Optional;
+
 import br.com.alurafood.pagamentos.dto.PagamentoDTO;
+import br.com.alurafood.pagamentos.http.PedidoClient;
 import br.com.alurafood.pagamentos.model.Pagamento;
 import br.com.alurafood.pagamentos.model.Status;
 import br.com.alurafood.pagamentos.repository.PagamentoRepository;
@@ -18,9 +21,12 @@ public class PagamentoService {
 
     private final ModelMapper modelMapper;
 
-    public PagamentoService(PagamentoRepository repository, ModelMapper modelMapper) {
+    private final PedidoClient pedido;
+
+    public PagamentoService(PagamentoRepository repository, ModelMapper modelMapper, PedidoClient pedido) {
         this.repository = repository;
         this.modelMapper = modelMapper;
+        this.pedido = pedido;
     }
 
     public Page<PagamentoDTO> obterTodos(Pageable paginacao) {
@@ -53,6 +59,20 @@ public class PagamentoService {
 
     public void excluirPagamento(Long id) {
         repository.deleteById(id);
+    }
+
+    public void confirmarPagamento(Long id){
+        Optional<Pagamento> optional = repository.findById(id);
+
+        if (!optional.isPresent()) {
+            throw new EntityNotFoundException();
+        }
+
+        Pagamento pagamento = optional.get();
+        pagamento.setStatus(Status.CONFIRMADO);
+        repository.save(pagamento);
+
+        pedido.atualizaPagamento(optional.get().getPedidoId());
     }
 
 }

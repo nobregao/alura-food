@@ -75,4 +75,16 @@ public class PagamentoService {
         pedido.atualizaPagamento(optional.get().getPedidoId());
     }
 
+    public void alteraStatus(Long id){
+        Optional<Pagamento> optional = repository.findById(id);
+
+        if (!optional.isPresent()) {
+            throw new EntityNotFoundException();
+        }
+
+        Pagamento pagamento = optional.get();
+        pagamento.setStatus(Status.CONFIRMADO_SEM_INTEGRACAO);
+        repository.save(pagamento);
+    }
+
 }

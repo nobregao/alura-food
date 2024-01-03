@@ -1,6 +1,8 @@
 package br.com.alurafood.pagamentos.amqp;
 
-import org.springframework.amqp.core.Queue;
+import static br.com.alurafood.pagamentos.util.RabbitMQUtil.EXCHANGE_PAGAMENTOS;
+
+import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -12,11 +14,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class PagamentoAMQPConfiguration {
-
-	@Bean
-	public Queue setQueue(){
-		return new Queue("pagamentos.concluido", false);
-	}
 
 	@Bean
 	public RabbitAdmin setRabbitAdmin(ConnectionFactory conn){
@@ -39,6 +36,11 @@ public class PagamentoAMQPConfiguration {
 		RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
 		rabbitTemplate.setMessageConverter(messageConverter);
 		return rabbitTemplate;
+	}
+
+	@Bean
+	public FanoutExchange setFanoutExchange(){
+		return new FanoutExchange(EXCHANGE_PAGAMENTOS);
 	}
 
 }

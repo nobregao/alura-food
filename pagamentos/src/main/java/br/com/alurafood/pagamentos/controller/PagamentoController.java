@@ -1,12 +1,12 @@
 package br.com.alurafood.pagamentos.controller;
 
+import static br.com.alurafood.pagamentos.util.RabbitMQUtil.EXCHANGE_PAGAMENTOS;
+
 import br.com.alurafood.pagamentos.dto.PagamentoDTO;
 import br.com.alurafood.pagamentos.service.PagamentoService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
-import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -48,7 +48,7 @@ public class PagamentoController {
         PagamentoDTO pagamento = service.criarPagamento(dto);
         URI endereco = uriBuilder.path("/pagamentos/{id}").buildAndExpand(pagamento.getId()).toUri();
 
-        rabbitTemplate.convertAndSend("pagamentos.concluido", pagamento);
+        rabbitTemplate.convertAndSend(EXCHANGE_PAGAMENTOS, "", pagamento);
 
         return ResponseEntity.created(endereco).body(pagamento);
     }

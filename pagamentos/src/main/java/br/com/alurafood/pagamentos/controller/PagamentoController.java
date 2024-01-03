@@ -4,6 +4,9 @@ import br.com.alurafood.pagamentos.dto.PagamentoDTO;
 import br.com.alurafood.pagamentos.service.PagamentoService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -21,9 +24,12 @@ public class PagamentoController {
 
     private final PagamentoService service;
 
-    public PagamentoController(PagamentoService service) {
+    private final RabbitTemplate rabbitTemplate;
+
+    public PagamentoController(PagamentoService service, RabbitTemplate rabbitTemplate) {
         this.service = service;
-    }
+		this.rabbitTemplate = rabbitTemplate;
+	}
 
     @GetMapping
     public Page<PagamentoDTO> listar(@PageableDefault(size = 10) Pageable paginacao) {
@@ -41,6 +47,8 @@ public class PagamentoController {
     public ResponseEntity<PagamentoDTO> cadastrar(@RequestBody @Valid PagamentoDTO dto, UriComponentsBuilder uriBuilder) {
         PagamentoDTO pagamento = service.criarPagamento(dto);
         URI endereco = uriBuilder.path("/pagamentos/{id}").buildAndExpand(pagamento.getId()).toUri();
+
+        rabbitTemplate.convertAndSend("pagamentos.concluido", pagamento);
 
         return ResponseEntity.created(endereco).body(pagamento);
     }

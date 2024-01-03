@@ -44,10 +44,10 @@ public class AvaliacaoAMQPConfiguration {
     }
 
     @Bean
-    public Queue queueDlqDetalhesAvaliacao() {
-        return QueueBuilder
-                .nonDurable(QUEUE_AVALIACAO_DEAD_LETTER)
-                .build();
+    public Binding bindPagamentoPedido() {
+        return BindingBuilder
+                .bind(queueDetalhesAvaliacao())
+                .to(fanoutExchange());
     }
 
     @Bean
@@ -58,17 +58,10 @@ public class AvaliacaoAMQPConfiguration {
     }
 
     @Bean
-    public FanoutExchange deadLetterExchange() {
-        return ExchangeBuilder
-                .fanoutExchange(EXCHANGE_DEADLETTER)
+    public Queue queueDlqDetalhesAvaliacao() {
+        return QueueBuilder
+                .nonDurable(QUEUE_AVALIACAO_DEAD_LETTER)
                 .build();
-    }
-
-    @Bean
-    public Binding bindPagamentoPedido() {
-        return BindingBuilder
-                .bind(queueDetalhesAvaliacao())
-                .to(fanoutExchange());
     }
 
     @Bean
@@ -76,6 +69,13 @@ public class AvaliacaoAMQPConfiguration {
         return BindingBuilder
                 .bind(queueDlqDetalhesAvaliacao())
                 .to(deadLetterExchange());
+    }
+
+    @Bean
+    public FanoutExchange deadLetterExchange() {
+        return ExchangeBuilder
+                .fanoutExchange(EXCHANGE_DEADLETTER)
+                .build();
     }
 
     @Bean

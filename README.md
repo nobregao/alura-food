@@ -1,14 +1,32 @@
 # alura-food
 
-Projeto desenvolvido em Spring com objetivo de praticar comunicação assíncrona usando RabbitMQ.
+Projeto desenvolvido em Spring utilizando Eureka e RabbitMQ com objetivo de praticar comunicação assíncrona.
 
 ## Arquitetura
+
+Server:
+- servidor de registro para os microsserviços.
+
+Microsserviços:
+- pagamentos
+- pedidos
+- avaliacao
+
+Exchange:
+- pagamentos.ex
+
+Filas:
+- pagamentos.detalhes-pedidos
+- pagamentos.detalhes-avaliacao
+- pagamentos.detalhes-avaliacao.dlq (dead letter queue)
 
 ![project-architecture](architecture.png)
 
 ## Endpoint
 
 **POST** `/pagamentos-ms/pagamentos` Cadastra pagamento
+
+### Curl
 ```bash
 curl --request POST \
   --url http://localhost:8082/pagamentos-ms/pagamentos \
@@ -25,6 +43,7 @@ curl --request POST \
         "pedidoId": 1
 }'
 ```
+### Response
 ```json
 {
 	"id": 1,
@@ -45,7 +64,7 @@ curl --request POST \
 ```bash
 docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.10-management
 ```
-- Após, start os microsserviços *server*, *gateway*, *pagamentos*, *avaliacao* e *pedido*
+- Suba os microsserviços *server*, *gateway*, *pagamentos*, *avaliacao* e *pedido*
 
 - Consulte os serviços registrados no Eureka em http://localhost:8081/
 

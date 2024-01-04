@@ -4,8 +4,6 @@ Projeto desenvolvido em Spring com objetivo de praticar comunicação assíncron
 
 ## Arquitetura
 
-
-
 ![project-architecture](architecture.png)
 
 ## Endpoint
@@ -47,11 +45,11 @@ curl --request POST \
 ```bash
 docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.10-management
 ```
-- Após pode subir os microsserviços *server*, *gateway*, *pagamentos*, *avaliacao* e *pedido*
+- Após, start os microsserviços *server*, *gateway*, *pagamentos*, *avaliacao* e *pedido*
 
-- Pode consultar os serviços registrados no Eureka acesse http://localhost:8081/
+- Consulte os serviços registrados no Eureka em http://localhost:8081/
 
-- Para as filas do RabbitMQ acesse http://localhost:15672/
+- Consulte as filas do RabbitMQ em http://localhost:15672/
      - Usuario e Senha é **guest**
 
 ## Links
